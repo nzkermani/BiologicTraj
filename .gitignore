@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 .DS_Store
 results/synthetic/pseudobulk/
+results/**/run_log.txt

@@ -1,0 +1,5 @@
+query,truth_matches,returned,true_positives,precision,recall
+shared delayed suppression,257,284,236,0.831,0.918
+"early sustained fall, anti-IL-4Ra only",10,478,10,0.021,1.0
+"transient rise, anti-IL-4Ra only",14,138,14,0.101,1.0
+"dip and recovery, anti-IL-5 only",3,163,3,0.018,1.0

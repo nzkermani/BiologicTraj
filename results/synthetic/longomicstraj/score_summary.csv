@@ -1,0 +1,5 @@
+estimator,threshold,rows_scored,planted_recovered,planted_recovery,false_nonflat,false_nonflat_rate,overall_agreement
+empirical,fixed,9963,550/553,0.995,322,0.034,0.967
+empirical,hybrid,9963,539/553,0.975,3705,0.394,0.627
+lmm,fixed,9595,532/535,0.994,292,0.032,0.969
+lmm,hybrid,9595,522/535,0.976,3589,0.396,0.625
