@@ -1,0 +1,97 @@
+drug_class,visit_month,cell_type,expected_fraction
+anti-IL-5,0,CD4 T naive,0.15706806282722513
+anti-IL-5,0,CD4 T central memory,0.1256544502617801
+anti-IL-5,0,CD4 T effector memory,0.06282722513089005
+anti-IL-5,0,Treg,0.031413612565445025
+anti-IL-5,0,CD8 T,0.1256544502617801
+anti-IL-5,0,NK,0.10471204188481677
+anti-IL-5,0,B naive,0.07329842931937174
+anti-IL-5,0,B memory,0.041884816753926704
+anti-IL-5,0,Classical monocyte,0.18848167539267016
+anti-IL-5,0,Non-classical monocyte,0.041884816753926704
+anti-IL-5,0,cDC,0.015706806282722512
+anti-IL-5,0,pDC,0.008376963350785341
+anti-IL-5,0,Basophil,0.012565445026178011
+anti-IL-5,0,Platelet,0.010471204188481676
+anti-IL-5,0,CD4 S1 (within CD4 switching types),0.1
+anti-IL-5,0,IL1B+ CM (within classical monocytes),0.6
+anti-IL-5,1,CD4 T naive,0.15836148648648649
+anti-IL-5,1,CD4 T central memory,0.1266891891891892
+anti-IL-5,1,CD4 T effector memory,0.0633445945945946
+anti-IL-5,1,Treg,0.0316722972972973
+anti-IL-5,1,CD8 T,0.1266891891891892
+anti-IL-5,1,NK,0.10557432432432434
+anti-IL-5,1,B naive,0.07390202702702704
+anti-IL-5,1,B memory,0.042229729729729736
+anti-IL-5,1,Classical monocyte,0.1900337837837838
+anti-IL-5,1,Non-classical monocyte,0.042229729729729736
+anti-IL-5,1,cDC,0.01583614864864865
+anti-IL-5,1,pDC,0.008445945945945946
+anti-IL-5,1,Basophil,0.0044341216216216214
+anti-IL-5,1,Platelet,0.010557432432432434
+anti-IL-5,1,CD4 S1 (within CD4 switching types),0.12
+anti-IL-5,1,IL1B+ CM (within classical monocytes),0.58
+anti-IL-5,6,CD4 T naive,0.15836148648648649
+anti-IL-5,6,CD4 T central memory,0.1266891891891892
+anti-IL-5,6,CD4 T effector memory,0.0633445945945946
+anti-IL-5,6,Treg,0.0316722972972973
+anti-IL-5,6,CD8 T,0.1266891891891892
+anti-IL-5,6,NK,0.10557432432432434
+anti-IL-5,6,B naive,0.07390202702702704
+anti-IL-5,6,B memory,0.042229729729729736
+anti-IL-5,6,Classical monocyte,0.1900337837837838
+anti-IL-5,6,Non-classical monocyte,0.042229729729729736
+anti-IL-5,6,cDC,0.01583614864864865
+anti-IL-5,6,pDC,0.008445945945945946
+anti-IL-5,6,Basophil,0.0044341216216216214
+anti-IL-5,6,Platelet,0.010557432432432434
+anti-IL-5,6,CD4 S1 (within CD4 switching types),0.7
+anti-IL-5,6,IL1B+ CM (within classical monocytes),0.2
+anti-IL-4Ra,0,CD4 T naive,0.15706806282722513
+anti-IL-4Ra,0,CD4 T central memory,0.1256544502617801
+anti-IL-4Ra,0,CD4 T effector memory,0.06282722513089005
+anti-IL-4Ra,0,Treg,0.031413612565445025
+anti-IL-4Ra,0,CD8 T,0.1256544502617801
+anti-IL-4Ra,0,NK,0.10471204188481677
+anti-IL-4Ra,0,B naive,0.07329842931937174
+anti-IL-4Ra,0,B memory,0.041884816753926704
+anti-IL-4Ra,0,Classical monocyte,0.18848167539267016
+anti-IL-4Ra,0,Non-classical monocyte,0.041884816753926704
+anti-IL-4Ra,0,cDC,0.015706806282722512
+anti-IL-4Ra,0,pDC,0.008376963350785341
+anti-IL-4Ra,0,Basophil,0.012565445026178011
+anti-IL-4Ra,0,Platelet,0.010471204188481676
+anti-IL-4Ra,0,CD4 S1 (within CD4 switching types),0.1
+anti-IL-4Ra,0,IL1B+ CM (within classical monocytes),0.6
+anti-IL-4Ra,1,CD4 T naive,0.15706806282722513
+anti-IL-4Ra,1,CD4 T central memory,0.1256544502617801
+anti-IL-4Ra,1,CD4 T effector memory,0.06282722513089005
+anti-IL-4Ra,1,Treg,0.031413612565445025
+anti-IL-4Ra,1,CD8 T,0.1256544502617801
+anti-IL-4Ra,1,NK,0.10471204188481677
+anti-IL-4Ra,1,B naive,0.07329842931937174
+anti-IL-4Ra,1,B memory,0.041884816753926704
+anti-IL-4Ra,1,Classical monocyte,0.18848167539267016
+anti-IL-4Ra,1,Non-classical monocyte,0.041884816753926704
+anti-IL-4Ra,1,cDC,0.015706806282722512
+anti-IL-4Ra,1,pDC,0.008376963350785341
+anti-IL-4Ra,1,Basophil,0.012565445026178011
+anti-IL-4Ra,1,Platelet,0.010471204188481676
+anti-IL-4Ra,1,CD4 S1 (within CD4 switching types),0.12
+anti-IL-4Ra,1,IL1B+ CM (within classical monocytes),0.58
+anti-IL-4Ra,6,CD4 T naive,0.15706806282722513
+anti-IL-4Ra,6,CD4 T central memory,0.1256544502617801
+anti-IL-4Ra,6,CD4 T effector memory,0.06282722513089005
+anti-IL-4Ra,6,Treg,0.031413612565445025
+anti-IL-4Ra,6,CD8 T,0.1256544502617801
+anti-IL-4Ra,6,NK,0.10471204188481677
+anti-IL-4Ra,6,B naive,0.07329842931937174
+anti-IL-4Ra,6,B memory,0.041884816753926704
+anti-IL-4Ra,6,Classical monocyte,0.18848167539267016
+anti-IL-4Ra,6,Non-classical monocyte,0.041884816753926704
+anti-IL-4Ra,6,cDC,0.015706806282722512
+anti-IL-4Ra,6,pDC,0.008376963350785341
+anti-IL-4Ra,6,Basophil,0.012565445026178011
+anti-IL-4Ra,6,Platelet,0.010471204188481676
+anti-IL-4Ra,6,CD4 S1 (within CD4 switching types),0.7
+anti-IL-4Ra,6,IL1B+ CM (within classical monocytes),0.2

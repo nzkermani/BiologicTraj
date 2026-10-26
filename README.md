@@ -47,13 +47,27 @@ Model training is in Python. LongOmicsTraj runs in R:
 devtools::install_github("nzkermani/LongOmicsTraj")
 ```
 
+## Synthetic data (start here)
+
+Until the PRISM data arrive, the pipeline is built on a **simulated** dataset with the same design (8 patients, 3 visits, ~89k PBMCs) and planted effects with known answers. Each trajectory shape has at least one planted test case.
+
+```bash
+pip install anndata scanpy
+python scripts/simulate_prism_like.py --out data/synthetic --seed 42   # ~20 s
+python scripts/check_synthetic.py --data data/synthetic --figdir docs/figures
+```
+
+<p align="center"><img src="docs/figures/synthetic_umap.png" alt="UMAP of the synthetic dataset" width="900"></p>
+
+The design, the planted effects and the baseline check are described in [data/synthetic/README.md](data/synthetic/README.md). These data are simulated and must not be used for biological conclusions.
+
 ## Repository layout
 
 ```
-docs/   project poster (PNG, PDF)
+scripts/            simulate_prism_like.py, check_synthetic.py
+data/synthetic/     ground truth for the simulated data (the .h5ad is regenerated, not committed)
+docs/               poster (PNG, PDF) and figures
 ```
-
-Code folders will be added as the project starts.
 
 ## References
 
