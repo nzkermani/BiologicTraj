@@ -13,3 +13,4 @@ results/**/stress_check/stress_scores_per_sample_celltype.csv
 results/**/log_*.txt
 results/**/aim1/embeddings.npz
 models/
+results/**/aim1/subsample_obs.csv
