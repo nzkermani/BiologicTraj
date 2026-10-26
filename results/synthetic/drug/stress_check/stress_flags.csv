@@ -1,0 +1,5 @@
+drug_class,transition,cell_types,co_moving,mean_delta_heat_shock,mean_delta_ieg,fraction_co_moving,flag
+anti-IL-4Ra,M0->M1,14,0,0.029152492,0.028144797,0.0,ok
+anti-IL-4Ra,M1->M6,14,1,-0.093600355,-1.3890554,0.07142857142857142,ok
+anti-IL-5,M0->M1,14,2,-0.11207039,-0.12903139,0.14285714285714285,ok
+anti-IL-5,M1->M6,13,0,0.018072866,-1.3066138,0.0,ok

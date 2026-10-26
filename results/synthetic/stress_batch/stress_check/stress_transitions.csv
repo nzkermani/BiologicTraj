@@ -1,0 +1,56 @@
+drug_class,cell_type,transition,n_patients,delta_heat_shock,delta_ieg,co_moving
+anti-IL-4Ra,B memory,M0->M1,4,0.058858156,0.07470107,False
+anti-IL-4Ra,B memory,M1->M6,4,-1.5739422,-1.5444539,True
+anti-IL-4Ra,B naive,M0->M1,4,0.049225092,0.028079927,False
+anti-IL-4Ra,B naive,M1->M6,4,-1.403024,-1.4565436,True
+anti-IL-4Ra,Basophil,M0->M1,4,-0.02076912,0.01737535,False
+anti-IL-4Ra,Basophil,M1->M6,4,-1.4575055,-1.6172079,True
+anti-IL-4Ra,CD4 T central memory,M0->M1,4,0.03192687,0.031818986,False
+anti-IL-4Ra,CD4 T central memory,M1->M6,4,-1.5009907,-1.894207,True
+anti-IL-4Ra,CD4 T effector memory,M0->M1,4,0.034290135,0.06864154,False
+anti-IL-4Ra,CD4 T effector memory,M1->M6,4,-1.5228126,-1.9452443,True
+anti-IL-4Ra,CD4 T naive,M0->M1,4,0.036815047,0.025363803,False
+anti-IL-4Ra,CD4 T naive,M1->M6,4,-1.5347893,-1.9212149,True
+anti-IL-4Ra,CD8 T,M0->M1,4,0.034399033,0.03265506,False
+anti-IL-4Ra,CD8 T,M1->M6,4,-1.5028002,-1.5417686,True
+anti-IL-4Ra,Classical monocyte,M0->M1,4,0.00941205,0.02325821,False
+anti-IL-4Ra,Classical monocyte,M1->M6,4,-1.4248407,-1.3683784,True
+anti-IL-4Ra,NK,M0->M1,4,0.019245446,0.039620876,False
+anti-IL-4Ra,NK,M1->M6,4,-1.536243,-1.5328245,True
+anti-IL-4Ra,Non-classical monocyte,M0->M1,4,0.01071167,0.021937609,False
+anti-IL-4Ra,Non-classical monocyte,M1->M6,4,-1.4026976,-1.3351488,True
+anti-IL-4Ra,Platelet,M0->M1,4,0.040038705,0.065722644,False
+anti-IL-4Ra,Platelet,M1->M6,4,-1.4723569,-1.5121113,True
+anti-IL-4Ra,Treg,M0->M1,4,0.03552544,0.0012818575,False
+anti-IL-4Ra,Treg,M1->M6,4,-1.4716816,-1.4985278,True
+anti-IL-4Ra,cDC,M0->M1,4,-0.032958925,0.05110866,False
+anti-IL-4Ra,cDC,M1->M6,4,-1.5062526,-1.5868511,True
+anti-IL-4Ra,pDC,M0->M1,4,0.020910025,0.029242754,False
+anti-IL-4Ra,pDC,M1->M6,4,-1.4428751,-1.4776689,True
+anti-IL-5,B memory,M0->M1,4,-0.0943383,-0.11509842,False
+anti-IL-5,B memory,M1->M6,4,-1.4219997,-1.472656,True
+anti-IL-5,B naive,M0->M1,4,-0.09031677,-0.10582924,False
+anti-IL-5,B naive,M1->M6,4,-1.3375444,-1.3569791,True
+anti-IL-5,Basophil,M0->M1,2,-0.049919367,0.010014057,False
+anti-IL-5,CD4 T central memory,M0->M1,4,-0.097438216,-0.10322678,False
+anti-IL-5,CD4 T central memory,M1->M6,4,-1.3753271,-1.8152308,True
+anti-IL-5,CD4 T effector memory,M0->M1,4,-0.11233926,-0.12654352,False
+anti-IL-5,CD4 T effector memory,M1->M6,4,-1.3798854,-1.8158877,True
+anti-IL-5,CD4 T naive,M0->M1,4,-0.10155773,-0.101481795,False
+anti-IL-5,CD4 T naive,M1->M6,4,-1.3955809,-1.839865,True
+anti-IL-5,CD8 T,M0->M1,4,-0.08277452,-0.0950163,False
+anti-IL-5,CD8 T,M1->M6,4,-1.405221,-1.4346614,True
+anti-IL-5,Classical monocyte,M0->M1,4,-0.08970988,-0.09619498,False
+anti-IL-5,Classical monocyte,M1->M6,4,-1.285265,-1.2399144,True
+anti-IL-5,NK,M0->M1,4,-0.10301709,-0.11491686,False
+anti-IL-5,NK,M1->M6,4,-1.3751435,-1.4221522,True
+anti-IL-5,Non-classical monocyte,M0->M1,4,-0.10781872,-0.109885335,False
+anti-IL-5,Non-classical monocyte,M1->M6,4,-1.2979524,-1.210901,True
+anti-IL-5,Platelet,M0->M1,4,-0.057261467,-0.07876575,False
+anti-IL-5,Platelet,M1->M6,4,-1.4815443,-1.4319277,True
+anti-IL-5,Treg,M0->M1,4,-0.09426463,-0.09647757,False
+anti-IL-5,Treg,M1->M6,4,-1.3718426,-1.3912582,True
+anti-IL-5,cDC,M0->M1,4,-0.077565014,-0.110878706,False
+anti-IL-5,cDC,M1->M6,4,-1.4067973,-1.4317695,True
+anti-IL-5,pDC,M0->M1,4,-0.14378774,-0.058909953,False
+anti-IL-5,pDC,M1->M6,3,-1.5071031,-1.6053282,True
