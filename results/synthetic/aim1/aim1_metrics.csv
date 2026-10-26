@@ -1,0 +1,2 @@
+method,seconds,genes_used,cell_type_knn_acc,visit_knn_bacc,drug_knn_bacc,same_patient_frac,same_patient_chance
+PCA (50 PCs),5.9,1625,0.9997996794871795,0.803763800047347,0.28034001545530945,0.31273222866797085,0.13014196378845191
