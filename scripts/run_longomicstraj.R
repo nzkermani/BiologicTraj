@@ -11,11 +11,17 @@
 # min_expr = -Inf because filterByExpr has already filtered) or log2 mean
 # pseudobulk (scripts/pseudobulk.py --mode mean; min_expr = log2(0.1)).
 #
-# Usage: Rscript scripts/run_longomicstraj.R <input_dir> <out_dir> [delta_min] [n_cores] [min_expr]
+# Usage: Rscript scripts/run_longomicstraj.R <input_dir> <out_dir> [delta_min] [n_cores] [min_expr] [estimators]
+#   estimators: comma-separated, default "empirical,lmm"
 suppressMessages({
   library(LongOmicsTraj)
   library(BiocParallel)
 })
+# LongOmicsTraj uses only the visit-level point estimates from emmeans (statistical
+# support comes from limma, normalise_pseudobulk.R); asymptotic df give identical
+# estimates (checked) and avoid the lmerTest/pbkrtest dependency. Run time is
+# dominated by the lmer fits themselves (~0.1 s per gene per cell type).
+emmeans::emm_options(lmer.df = "asymptotic")
 
 args      <- commandArgs(trailingOnly = TRUE)
 pb_dir    <- if (length(args) >= 1) args[1] else "results/synthetic/pseudobulk"
@@ -24,6 +30,7 @@ delta_min <- if (length(args) >= 3) as.numeric(args[3]) else 0.35
 n_cores   <- if (length(args) >= 4) as.integer(args[4]) else max(1L, parallel::detectCores() - 1L)
 min_expr  <- if (length(args) >= 5) as.numeric(args[5]) else log2(0.1)  # minimum max value to analyse a gene
 fixed_thr <- sort(unique(c(0.25, 0.35, 0.5, delta_min)))
+estimators <- if (length(args) >= 6) strsplit(args[6], ",")[[1]] else c("empirical", "lmm")
 visits    <- c("M0", "M1", "M6")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -77,7 +84,7 @@ for (i in seq_len(nrow(index))) {
   if (!length(ok_groups)) next
   base <- lot_create(expression = m, metadata = meta, visit_levels = visits,
                      time_values = c(M0 = 0, M1 = 1, M6 = 6))
-  for (est in c("empirical", "lmm")) {
+  for (est in estimators) {
     t0 <- Sys.time()
     est_lot <- tryCatch(estimate(base, est, length(ok_groups)), error = function(e) { message(ct, " ", est, ": ", conditionMessage(e)); NULL })
     if (is.null(est_lot)) next
@@ -90,7 +97,7 @@ for (i in seq_len(nrow(index))) {
       timing[[length(timing) + 1]] <- data.frame(cell_type = ct, estimator = est, threshold = thr,
                                                  n_genes = nrow(m), seconds = as.numeric(difftime(Sys.time(), t0, units = "secs")))
       # comparator-aware queries (main analysis: LMM + fixed threshold)
-      if (est == "lmm" && thr == paste0("fixed_", delta_min) && length(ok_groups) == 2) {
+      if (est == estimators[length(estimators)] && thr == paste0("fixed_", delta_min) && length(ok_groups) == 2) {
         q <- function(cond, label) {
           # lot_query returns an S4Vectors DataFrame of matching OTS rows
           f <- tryCatch(as.data.frame(lot_query(res$lot, conditions = cond)), error = function(e) NULL)

@@ -1,0 +1,9 @@
+estimator,threshold,rows_scored,planted_recovered,planted_recovery,false_nonflat,false_nonflat_rate
+empirical,fixed_0.25,10135,539/553,0.975,771,0.08
+empirical,fixed_0.25+support,10135,553/553,1.0,3,0.0
+empirical,fixed_0.35,10135,548/553,0.991,294,0.031
+empirical,fixed_0.35+support,10135,553/553,1.0,3,0.0
+empirical,fixed_0.5,10135,552/553,0.998,63,0.007
+empirical,fixed_0.5+support,10135,553/553,1.0,3,0.0
+empirical,hybrid,10135,537/553,0.971,3798,0.396
+empirical,hybrid+support,10135,553/553,1.0,3,0.0

@@ -1,0 +1,57 @@
+"cell_type","estimator","threshold","n_genes","seconds"
+"B memory","empirical","fixed_0.25",1523,3.61070513725281
+"B memory","empirical","fixed_0.35",1523,6.73607611656189
+"B memory","empirical","fixed_0.5",1523,9.78240203857422
+"B memory","empirical","hybrid",1523,12.9546728134155
+"B naive","empirical","fixed_0.25",1594,4.018150806427
+"B naive","empirical","fixed_0.35",1594,6.94433307647705
+"B naive","empirical","fixed_0.5",1594,10.129444360733
+"B naive","empirical","hybrid",1594,13.0181858539581
+"Basophil","empirical","fixed_0.25",1245,2.41871786117554
+"Basophil","empirical","fixed_0.35",1245,5.4932382106781
+"Basophil","empirical","fixed_0.5",1245,8.01933622360229
+"Basophil","empirical","hybrid",1245,10.5876257419586
+"CD4 T central memory","empirical","fixed_0.25",1617,3.41873979568481
+"CD4 T central memory","empirical","fixed_0.35",1617,6.79372406005859
+"CD4 T central memory","empirical","fixed_0.5",1617,10.3742761611938
+"CD4 T central memory","empirical","hybrid",1617,13.7660686969757
+"CD4 T effector memory","empirical","fixed_0.25",1584,3.5082700252533
+"CD4 T effector memory","empirical","fixed_0.35",1584,7.08414673805237
+"CD4 T effector memory","empirical","fixed_0.5",1584,10.7276329994202
+"CD4 T effector memory","empirical","hybrid",1584,14.3864612579346
+"CD4 T naive","empirical","fixed_0.25",1622,3.83751749992371
+"CD4 T naive","empirical","fixed_0.35",1622,7.59567284584045
+"CD4 T naive","empirical","fixed_0.5",1622,11.6563038825989
+"CD4 T naive","empirical","hybrid",1622,15.4641878604889
+"CD8 T","empirical","fixed_0.25",1620,4.15764141082764
+"CD8 T","empirical","fixed_0.35",1620,7.29717135429382
+"CD8 T","empirical","fixed_0.5",1620,10.4798009395599
+"CD8 T","empirical","hybrid",1620,13.4687561988831
+"Classical monocyte","empirical","fixed_0.25",1623,3.20658206939697
+"Classical monocyte","empirical","fixed_0.35",1623,6.59932732582092
+"Classical monocyte","empirical","fixed_0.5",1623,10.2883565425873
+"Classical monocyte","empirical","hybrid",1623,13.7179274559021
+"NK","empirical","fixed_0.25",1614,3.4162905216217
+"NK","empirical","fixed_0.35",1614,6.97487449645996
+"NK","empirical","fixed_0.5",1614,10.5055358409882
+"NK","empirical","hybrid",1614,14.1618988513947
+"Non-classical monocyte","empirical","fixed_0.25",1536,3.46409153938293
+"Non-classical monocyte","empirical","fixed_0.35",1536,6.97780799865723
+"Non-classical monocyte","empirical","fixed_0.5",1536,10.60977435112
+"Non-classical monocyte","empirical","hybrid",1536,14.1186671257019
+"Platelet","empirical","fixed_0.25",1011,2.38566708564758
+"Platelet","empirical","fixed_0.35",1011,4.89776158332825
+"Platelet","empirical","fixed_0.5",1011,7.42868590354919
+"Platelet","empirical","hybrid",1011,9.88937568664551
+"Treg","empirical","fixed_0.25",1432,4.16120529174805
+"Treg","empirical","fixed_0.35",1432,6.8269317150116
+"Treg","empirical","fixed_0.5",1432,9.58623003959656
+"Treg","empirical","hybrid",1432,12.3399240970612
+"cDC","empirical","fixed_0.25",1144,2.02607226371765
+"cDC","empirical","fixed_0.35",1144,4.35140609741211
+"cDC","empirical","fixed_0.5",1144,6.90353345870972
+"cDC","empirical","hybrid",1144,9.27419495582581
+"pDC","empirical","fixed_0.25",913,1.93801999092102
+"pDC","empirical","fixed_0.35",913,3.81336426734924
+"pDC","empirical","fixed_0.5",913,5.64505290985107
+"pDC","empirical","hybrid",913,7.47420573234558

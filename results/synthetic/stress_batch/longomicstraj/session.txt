@@ -1,0 +1,2 @@
+LongOmicsTraj 0.99.0, R 4.5.3
+input = results/synthetic/stress_batch/pseudobulk_voom; query threshold = 0.35; fixed thresholds = 0.25,0.35,0.5; min_expr = -Inf; cores = 1

@@ -1,0 +1,9 @@
+filter,query,truth_matches,returned,true_positives,precision,recall
+empirical fixed_0.35,shared delayed suppression,257,252,234,0.929,0.911
+empirical fixed_0.35,"early sustained fall, anti-IL-4Ra only",10,452,10,0.022,1.0
+empirical fixed_0.35,"transient rise, anti-IL-4Ra only",14,174,14,0.08,1.0
+empirical fixed_0.35,"dip and recovery, anti-IL-5 only",3,156,3,0.019,1.0
+empirical fixed_0.35+support,shared delayed suppression,257,239,239,1.0,0.93
+empirical fixed_0.35+support,"early sustained fall, anti-IL-4Ra only",10,12,10,0.833,1.0
+empirical fixed_0.35+support,"transient rise, anti-IL-4Ra only",14,14,14,1.0,1.0
+empirical fixed_0.35+support,"dip and recovery, anti-IL-5 only",3,4,3,0.75,1.0

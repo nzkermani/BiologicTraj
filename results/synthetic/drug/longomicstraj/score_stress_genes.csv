@@ -1,0 +1,9 @@
+estimator,threshold,stress_genes_truly_flat,called_changing
+empirical,fixed_0.25,216,14
+empirical,fixed_0.25+support,216,0
+empirical,fixed_0.35,216,2
+empirical,fixed_0.35+support,216,0
+empirical,fixed_0.5,216,0
+empirical,fixed_0.5+support,216,0
+empirical,hybrid,216,166
+empirical,hybrid+support,216,0

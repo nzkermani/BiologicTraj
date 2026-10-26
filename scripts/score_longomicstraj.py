@@ -84,6 +84,7 @@ def main():
     ap.add_argument("--transitions", default=None)
     ap.add_argument("--alpha", type=float, default=0.05)
     ap.add_argument("--query-threshold", default="fixed_0.35")
+    ap.add_argument("--query-estimator", default="lmm")
     args = ap.parse_args()
     res = Path(args.res)
 
@@ -111,9 +112,9 @@ def main():
 
     qs = []
     for thr in [args.query_threshold, args.query_threshold + "+support"]:
-        sub = ots[(ots["estimator"] == "lmm") & (ots["threshold"] == thr)]
+        sub = ots[(ots["estimator"] == args.query_estimator) & (ots["threshold"] == thr)]
         if len(sub):
-            qs.append(score_queries(sub, truth, f"lmm {thr}"))
+            qs.append(score_queries(sub, truth, f"{args.query_estimator} {thr}"))
     qsum = pd.concat(qs) if qs else pd.DataFrame()
 
     analysed = ots[KEY].drop_duplicates()
