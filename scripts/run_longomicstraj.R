@@ -25,11 +25,13 @@ samples <- read.csv(file.path(pb_dir, "samples.csv"))
 index   <- read.csv(file.path(pb_dir, "index.csv"))
 bp      <- if (n_cores > 1) MulticoreParam(workers = n_cores) else SerialParam()
 
-estimate <- function(lot, estimator) {
+estimate <- function(lot, estimator, n_groups) {
   if (estimator == "empirical") {
     lot_from_empirical(lot, assay = "transcriptomics", visits = visits, overwrite = TRUE, verbose = FALSE)
   } else {
-    lot_from_lmm(lot, assay = "transcriptomics", formula_fixed = y ~ group * visit + (1 | subject_id),
+    # a group x visit interaction needs two groups; fall back to visit only
+    f <- if (n_groups > 1) y ~ group * visit + (1 | subject_id) else y ~ visit + (1 | subject_id)
+    lot_from_lmm(lot, assay = "transcriptomics", formula_fixed = f,
                  visits = visits, BPPARAM = bp, overwrite = TRUE, verbose = FALSE)
   }
 }
@@ -70,7 +72,7 @@ for (i in seq_len(nrow(index))) {
                      time_values = c(M0 = 0, M1 = 1, M6 = 6))
   for (est in c("empirical", "lmm")) {
     t0 <- Sys.time()
-    est_lot <- tryCatch(estimate(base, est), error = function(e) { message(ct, " ", est, ": ", conditionMessage(e)); NULL })
+    est_lot <- tryCatch(estimate(base, est, length(ok_groups)), error = function(e) { message(ct, " ", est, ": ", conditionMessage(e)); NULL })
     if (is.null(est_lot)) next
     for (thr in c("fixed", "hybrid")) {
       res <- tryCatch(run_one(est_lot, thr), error = function(e) { message(ct, " ", est, " ", thr, ": ", conditionMessage(e)); NULL })
