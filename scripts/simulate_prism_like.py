@@ -82,7 +82,9 @@ MODULES = {
     "cytotoxic": ["GZMB", "GZMH", "PRF1"],
     "mhc2": ["HLA-DRA", "HLA-DRB1", "CD74"],
 }
-N_FILLER = 1500  # synthetic background genes, always flat
+N_FILLER = 1500  # background genes, always flat
+BACKGROUND_FILE = Path(__file__).resolve().parent.parent / "data" / "synthetic" / "background_genes.txt"
+BACKGROUND_SEED = 7  # separate stream, so the choice of names does not change the simulated counts
 EXPRESSED_MIN = 0.5  # mean UMI per cell; below this a gene is not scored in the ground truth
 
 # CD4 cell types that carry the S0 -> S1 state switch
@@ -117,8 +119,18 @@ def build_gene_table(rng: np.random.Generator) -> pd.DataFrame:
     for m, genes in MODULES.items():
         for g in genes:
             add(g, m)
-    for i in range(N_FILLER):
-        rows.append({"gene": f"SYNG{i + 1:04d}", "module": "background", "synthetic_name": True})
+    # background genes: real symbols from data/synthetic/background_genes.txt (see
+    # scripts/export_background_genes.R) so foundation models recognise them;
+    # falls back to synthetic SYNG names if the file is missing
+    if BACKGROUND_FILE.exists():
+        pool = [g.strip() for g in BACKGROUND_FILE.read_text().splitlines() if g.strip()]
+        pool = [g for g in pool if g not in seen]
+        pick = np.random.default_rng(BACKGROUND_SEED).choice(len(pool), size=N_FILLER, replace=False)
+        for i in sorted(pick):
+            add(pool[i], "background")
+    else:
+        for i in range(N_FILLER):
+            rows.append({"gene": f"SYNG{i + 1:04d}", "module": "background", "synthetic_name": True})
     return pd.DataFrame(rows).set_index("gene")
 
 

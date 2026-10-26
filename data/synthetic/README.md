@@ -11,7 +11,7 @@ python scripts/simulate_prism_like.py --out data/synthetic --seed 42
 python scripts/check_synthetic.py --data data/synthetic --figdir docs/figures
 ```
 
-Generation takes about 20 seconds. `prism_like_synthetic.h5ad` (~73 MB) is not committed, because it is fully reproducible from the seed.
+The background gene names come from `background_genes.txt` (regenerate with `Rscript scripts/export_background_genes.R`, which needs msigdbr 7.5.1). Generation takes about 20 seconds. `prism_like_synthetic.h5ad` (~73 MB) is not committed, because it is fully reproducible from the seed.
 
 ## Design
 
@@ -20,7 +20,7 @@ Generation takes about 20 seconds. `prism_like_synthetic.h5ad` (~73 MB) is not c
 | Patients | 8: mepolizumab P1–P2, reslizumab P3–P4, dupilumab P5–P8 | same |
 | Visits | 0, 1, 6 months (24 samples) | same |
 | Cells | ~88,800 (~3,700 per sample) | 89,728 |
-| Genes | 1,617: 117 real immune/housekeeping symbols + 1,500 background genes named `SYNG0001…` | 25,242 |
+| Genes | 1,617 real human symbols: 117 immune/housekeeping genes carrying the planted biology + 1,500 background genes | 25,242 |
 | Counts | negative binomial (θ = 6), patient effects (SD 0.15 log), cell size factors | — |
 
 14 PBMC cell types, plus states: CD4 T cells S0/S1 and classical monocytes IL1B+/S100A+.
@@ -57,5 +57,5 @@ This is the bar the LongOmicsTraj mixed-model estimator should meet or beat. The
 ## Limitations
 
 - Real PBMC data have continuous states, ambient RNA, doublets and batch effects; clusters here are far cleaner.
-- Background genes have synthetic names, so scGPT and PerturbGen will not recognise them; only the 117 real symbols carry pretrained knowledge. A more realistic version would draw the background from real genes.
+- Background genes have real names (a random draw from MSigDB Hallmark and Reactome genes; see `scripts/export_background_genes.R` and `background_genes.txt`), so scGPT and PerturbGen will tokenise them. But their expression is random noise, not their real biology: a foundation model's prior about, say, *ABCB6* is not reflected in these data. Only the 117 planted genes behave biologically, and only in the ways listed above.
 - There is no ground truth for in silico perturbation (Aim 3) beyond the direction of planted drug effects.
