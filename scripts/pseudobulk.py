@@ -1,8 +1,11 @@
-"""Pseudobulk an AnnData object by sample x cell type for LongOmicsTraj.
+"""Pseudobulk an AnnData object by sample x cell type.
 
-Value per gene and sample: log2(mean UMI per cell + 1e-3), i.e. the same scale
-as the synthetic ground truth. Writes one genes x samples CSV per cell type and
-one sample metadata table.
+--mode sum   (recommended) summed UMI counts per gene and sample, for a count
+             model (edgeR/limma-voom, scripts/normalise_pseudobulk.R).
+--mode mean  log2(mean UMI per cell + 1e-3): the scale of the synthetic ground
+             truth; quick, but no library-size normalisation or count model.
+
+Writes one genes x samples CSV per cell type, a sample table and an index.
 
 Usage: python scripts/pseudobulk.py --h5ad data/synthetic/prism_like_synthetic.h5ad \
          --out results/synthetic/pseudobulk --min-cells 20
@@ -27,6 +30,7 @@ def main():
     ap.add_argument("--out", default="results/synthetic/pseudobulk")
     ap.add_argument("--min-cells", type=int, default=20, help="drop sample x cell type groups with fewer cells")
     ap.add_argument("--offset", type=float, default=1e-3)
+    ap.add_argument("--mode", choices=["sum", "mean"], default="sum")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -34,7 +38,9 @@ def main():
     adata = ad.read_h5ad(args.h5ad)
     obs = adata.obs
 
-    samples = (obs[["sample", "patient", "drug", "drug_class", "visit", "visit_month"]]
+    meta_cols = [c for c in ["sample", "patient", "drug", "drug_class", "visit", "visit_month",
+                             "processing_batch"] if c in obs]
+    samples = (obs[meta_cols]
                .drop_duplicates().set_index("sample").sort_index())
     samples.to_csv(out / "samples.csv")
 
@@ -46,14 +52,20 @@ def main():
             ncell[sample] = len(rows)
             if len(rows) < args.min_cells:
                 continue
-            cols.append(np.asarray(adata.X[rows].mean(axis=0)).ravel())
+            agg = adata.X[rows].sum(axis=0) if args.mode == "sum" else adata.X[rows].mean(axis=0)
+            cols.append(np.asarray(agg).ravel())
             names.append(sample)
         if not cols:
             continue
-        mat = pd.DataFrame(np.log2(np.vstack(cols).T + args.offset), index=adata.var_names, columns=names)
+        vals = np.vstack(cols).T
+        if args.mode == "mean":
+            vals = np.log2(vals + args.offset)
+        else:
+            vals = vals.astype(np.int64)
+        mat = pd.DataFrame(vals, index=adata.var_names, columns=names)
         f = out / f"{slug(ct)}.csv"
         mat.to_csv(f)
-        index.append({"cell_type": ct, "file": f.name, "n_samples": len(names),
+        index.append({"cell_type": ct, "file": f.name, "n_samples": len(names), "mode": args.mode,
                       "median_cells": int(np.median(list(ncell.values())))})
     pd.DataFrame(index).to_csv(out / "index.csv", index=False)
     print(pd.DataFrame(index).to_string(index=False))

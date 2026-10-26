@@ -3,10 +3,15 @@
 # Features = genes; group = drug class; subject = patient; visits = M0, M1, M6.
 # Estimators: empirical visit means and a linear mixed model
 #   y ~ group * visit + (1 | subject_id)
-# Thresholds: "fixed" at delta_min (default 0.35, the synthetic ground-truth
-# threshold) and the package default "hybrid".
+# Thresholds: "fixed" at 0.25, 0.35 and 0.5 (the synthetic ground truth uses
+# 0.35, so 0.25 and 0.5 test sensitivity to a mismatched threshold) and the
+# package default "hybrid". Queries use the fixed threshold given as delta_min.
 #
-# Usage: Rscript scripts/run_longomicstraj.R results/synthetic/pseudobulk results/synthetic/longomicstraj [delta_min] [n_cores]
+# Input: either voom logCPM (scripts/normalise_pseudobulk.R; recommended, use
+# min_expr = -Inf because filterByExpr has already filtered) or log2 mean
+# pseudobulk (scripts/pseudobulk.py --mode mean; min_expr = log2(0.1)).
+#
+# Usage: Rscript scripts/run_longomicstraj.R <input_dir> <out_dir> [delta_min] [n_cores] [min_expr]
 suppressMessages({
   library(LongOmicsTraj)
   library(BiocParallel)
@@ -17,7 +22,8 @@ pb_dir    <- if (length(args) >= 1) args[1] else "results/synthetic/pseudobulk"
 out_dir   <- if (length(args) >= 2) args[2] else "results/synthetic/longomicstraj"
 delta_min <- if (length(args) >= 3) as.numeric(args[3]) else 0.35
 n_cores   <- if (length(args) >= 4) as.integer(args[4]) else max(1L, parallel::detectCores() - 1L)
-min_expr  <- log2(0.1)  # analyse genes reaching 0.1 UMI per cell in at least one sample
+min_expr  <- if (length(args) >= 5) as.numeric(args[5]) else log2(0.1)  # minimum max value to analyse a gene
+fixed_thr <- sort(unique(c(0.25, 0.35, 0.5, delta_min)))
 visits    <- c("M0", "M1", "M6")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
@@ -38,8 +44,9 @@ estimate <- function(lot, estimator, n_groups) {
 
 run_one <- function(lot, threshold) {
   lot <- lot_compute_deltas(lot, assay = "transcriptomics", visits = visits, overwrite = TRUE)
-  lot <- if (threshold == "fixed") {
-    lot_compute_thresholds(lot, assay = "transcriptomics", method = "fixed", delta_min = delta_min,
+  lot <- if (startsWith(threshold, "fixed")) {
+    lot_compute_thresholds(lot, assay = "transcriptomics", method = "fixed",
+                           delta_min = as.numeric(sub("fixed_", "", threshold)),
                            visits = visits, overwrite = TRUE, verbose = FALSE)
   } else {
     lot_compute_thresholds(lot, assay = "transcriptomics", method = "hybrid",
@@ -74,7 +81,7 @@ for (i in seq_len(nrow(index))) {
     t0 <- Sys.time()
     est_lot <- tryCatch(estimate(base, est, length(ok_groups)), error = function(e) { message(ct, " ", est, ": ", conditionMessage(e)); NULL })
     if (is.null(est_lot)) next
-    for (thr in c("fixed", "hybrid")) {
+    for (thr in c(paste0("fixed_", fixed_thr), "hybrid")) {
       res <- tryCatch(run_one(est_lot, thr), error = function(e) { message(ct, " ", est, " ", thr, ": ", conditionMessage(e)); NULL })
       if (is.null(res)) next
       o <- res$ots
@@ -83,7 +90,7 @@ for (i in seq_len(nrow(index))) {
       timing[[length(timing) + 1]] <- data.frame(cell_type = ct, estimator = est, threshold = thr,
                                                  n_genes = nrow(m), seconds = as.numeric(difftime(Sys.time(), t0, units = "secs")))
       # comparator-aware queries (main analysis: LMM + fixed threshold)
-      if (est == "lmm" && thr == "fixed" && length(ok_groups) == 2) {
+      if (est == "lmm" && thr == paste0("fixed_", delta_min) && length(ok_groups) == 2) {
         q <- function(cond, label) {
           # lot_query returns an S4Vectors DataFrame of matching OTS rows
           f <- tryCatch(as.data.frame(lot_query(res$lot, conditions = cond)), error = function(e) NULL)
@@ -108,6 +115,7 @@ write.csv(ots[, c("cell_type", "object_id", "group", "estimator", "threshold", "
 write.csv(do.call(rbind, queries), file.path(out_dir, "queries.csv"), row.names = FALSE)
 write.csv(do.call(rbind, timing), file.path(out_dir, "timing.csv"), row.names = FALSE)
 writeLines(c(sprintf("LongOmicsTraj %s, R %s", packageVersion("LongOmicsTraj"), getRversion()),
-             sprintf("delta_min = %s; min_expr = log2(0.1); cores = %d", delta_min, n_cores)),
+             sprintf("input = %s; query threshold = %s; fixed thresholds = %s; min_expr = %s; cores = %d",
+                     pb_dir, delta_min, paste(fixed_thr, collapse = ","), min_expr, n_cores)),
            file.path(out_dir, "session.txt"))
 cat("rows:", nrow(ots), "\n")

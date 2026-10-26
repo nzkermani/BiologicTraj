@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# End-to-end BiologicTraj pipeline on one dataset.
+#
+#   1. processing-stress check            (Python, scanpy)
+#   2. summed-count pseudobulk            (Python)
+#   3. edgeR/limma-voom count model       (R)  -> logCPM + transition tests
+#   4. LongOmicsTraj trajectory shapes    (R)  -> empirical + LMM, several thresholds
+#   5. score against ground truth         (Python; synthetic data only)
+#
+# Usage: scripts/run_pipeline.sh <h5ad> <out_dir> [truth_csv]
+#   e.g. scripts/run_pipeline.sh data/synthetic/prism_like_synthetic.h5ad results/synthetic/drug \
+#          data/synthetic/ground_truth_gene_topology.csv
+# R must have LongOmicsTraj, edgeR and limma installed. Set RSCRIPT to override the
+# R command (e.g. RSCRIPT="micromamba run -n lot Rscript").
+set -euo pipefail
+H5AD=$1; OUT=$2; TRUTH=${3:-}
+RSCRIPT=${RSCRIPT:-Rscript}
+mkdir -p "$OUT"
+
+python3 scripts/stress_check.py --h5ad "$H5AD" --out "$OUT/stress_check"
+python3 scripts/pseudobulk.py --h5ad "$H5AD" --mode sum --out "$OUT/pseudobulk_counts" --min-cells 20
+$RSCRIPT scripts/normalise_pseudobulk.R "$OUT/pseudobulk_counts" "$OUT/pseudobulk_voom"
+$RSCRIPT scripts/run_longomicstraj.R "$OUT/pseudobulk_voom" "$OUT/longomicstraj" 0.35 1 -Inf
+if [[ -n "$TRUTH" ]]; then
+  python3 scripts/score_longomicstraj.py --res "$OUT/longomicstraj" --truth-file "$TRUTH" \
+    --transitions "$OUT/pseudobulk_voom/transitions.csv"
+fi

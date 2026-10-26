@@ -5,3 +5,9 @@ __pycache__/
 .DS_Store
 results/synthetic/pseudobulk/
 results/**/run_log.txt
+results/**/pseudobulk_counts/
+results/**/pseudobulk_voom/*.csv
+!results/**/pseudobulk_voom/index.csv
+results/**/longomicstraj/ots_all.csv
+results/**/stress_check/stress_scores_per_sample_celltype.csv
+results/**/log_*.txt

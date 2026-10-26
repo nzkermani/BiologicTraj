@@ -24,6 +24,18 @@ Anti-IL-5: CLC / IL5RA / HDC in basophils       down_flat; basophils fall
 Anti-IL-5: cytotoxic module in CD8 T cells      down_up    (dip, recovery)
 Everything else                                  flat_flat
 
+Scenarios (--scenario)
+----------------------
+drug          (default) the effects above are biology; sample processing stress
+              is similar at every visit.
+stress_batch  NO late NF-kB/AP-1 drug effect. Instead, 0- and 1-month samples are
+              processed in a high-stress batch and 6-month samples in a
+              low-stress batch, so stress genes (heat-shock + immediate-early)
+              fall at 6 months in every cell type: an artefact that mimics the
+              published signal. All other planted drug effects are unchanged.
+              The biological truth for the stress genes is flat_flat; the
+              expected observed shape is recorded separately.
+
 The true topology of every gene x cell type x drug class is computed from the
 noise-free generative means and written alongside the data.
 
@@ -81,7 +93,20 @@ MODULES = {
     "il5_baso": ["CLC", "IL5RA"],
     "cytotoxic": ["GZMB", "GZMH", "PRF1"],
     "mhc2": ["HLA-DRA", "HLA-DRB1", "CD74"],
+    # dissociation / processing stress (van den Brink et al., Nat Methods 2017):
+    # heat-shock genes are not expected to respond to biologics, so they act as
+    # an internal control for processing artefacts
+    "heat_shock": ["HSPA1A", "HSPA1B", "DNAJB1", "HSPH1", "HSP90AA1", "HSPA8"],
+    "stress_ieg": ["ATF3", "IER3"],
 }
+# genes raised by processing stress: heat-shock + immediate-early genes, the
+# latter overlapping the NF-kB/AP-1 module whose fall is the published signal
+STRESS_GENES = (["HSPA1A", "HSPA1B", "DNAJB1", "HSPH1", "HSP90AA1", "HSPA8", "ATF3", "IER3"]
+                + ["FOS", "FOSB", "JUN", "JUNB", "IER2", "EGR1", "DUSP1", "ZFP36", "NFKBIA", "CD69"])
+STRESS_SHIFT = 1.2  # log-scale rise in stress genes at stress level 1
+# expected processing stress per visit (per-sample values add noise, SD 0.1)
+STRESS_BY_VISIT = {"drug": {0: 0.5, 1: 0.5, 6: 0.5}, "stress_batch": {0: 1.0, 1: 1.0, 6: 0.0}}
+BATCH_BY_VISIT = {"drug": {0: "B1", 1: "B1", 6: "B1"}, "stress_batch": {0: "B1", 1: "B1", 6: "B2"}}
 N_FILLER = 1500  # background genes, always flat
 BACKGROUND_FILE = Path(__file__).resolve().parent.parent / "data" / "synthetic" / "background_genes.txt"
 BACKGROUND_SEED = 7  # separate stream, so the choice of names does not change the simulated counts
@@ -155,7 +180,15 @@ def baseline_log_means(genes: pd.DataFrame, rng: np.random.Generator) -> pd.Data
     mu.loc[MODULES["cytotoxic"], ["CD8 T", "NK"]] = 2.0
     mu.loc[MODULES["mhc2"], ["B naive", "B memory", "Classical monocyte",
                              "Non-classical monocyte", "cDC", "pDC"]] = 2.5
+    mu.loc[MODULES["heat_shock"], :] = rng.uniform(0.5, 1.5, size=(len(MODULES["heat_shock"]), len(cts)))
+    mu.loc[MODULES["stress_ieg"], :] = rng.uniform(-0.5, 0.5, size=(len(MODULES["stress_ieg"]), len(cts)))
     return mu
+
+
+def stress_vector(genes: pd.Index) -> np.ndarray:
+    v = pd.Series(0.0, index=genes)
+    v[STRESS_GENES] = STRESS_SHIFT
+    return v.values
 
 
 def state_effects(mu: pd.DataFrame) -> dict:
@@ -171,12 +204,14 @@ def state_effects(mu: pd.DataFrame) -> dict:
     return {"S1": s1, "IL1B+": il1b, "S100A+": s100}
 
 
-def treatment_effect(genes: pd.Index, cell_type: str, drug_class: str, visit: int) -> pd.Series:
+def treatment_effect(genes: pd.Index, cell_type: str, drug_class: str, visit: int,
+                     scenario: str = "drug") -> pd.Series:
     """Log-scale treatment effect on gene means for one cell type, drug class and visit."""
     eff = pd.Series(0.0, index=genes)
     v = {0: 0, 1: 1, 6: 2}[visit]
-    # late NF-kB/AP-1 suppression, all cells, both drugs
-    eff[MODULES["nfkb_ap1"]] += [0.0, 0.0, -1.0][v]
+    # late NF-kB/AP-1 suppression, all cells, both drugs (absent in the stress_batch scenario)
+    if scenario == "drug":
+        eff[MODULES["nfkb_ap1"]] += [0.0, 0.0, -1.0][v]
     if drug_class == "anti-IL-4Ra":
         if cell_type in ("B naive", "B memory"):
             eff[MODULES["stat6_b"]] += [0.0, -1.2, -1.2][v]
@@ -202,7 +237,9 @@ def classify(delta: np.ndarray, thr: float) -> np.ndarray:
 
 
 def simulate(seed: int = 42, cells_per_sample: int = 3700, theta: float = 6.0,
-             patient_sd: float = 0.15, ots_threshold: float = 0.35):
+             patient_sd: float = 0.15, ots_threshold: float = 0.35, scenario: str = "drug"):
+    if scenario not in STRESS_BY_VISIT:
+        raise ValueError(f"unknown scenario {scenario!r}")
     rng = np.random.default_rng(seed)
     genes = build_gene_table(rng)
     mu0 = baseline_log_means(genes, rng)
@@ -211,6 +248,9 @@ def simulate(seed: int = 42, cells_per_sample: int = 3700, theta: float = 6.0,
 
     patient_gene = {p: rng.normal(0, patient_sd, size=len(gidx)) for p in PATIENTS}
     patient_comp = {p: rng.dirichlet(np.full(len(BASE_PROPORTIONS), 200.0)) for p in PATIENTS}
+    svec = stress_vector(gidx)
+    sample_stress = {(p, v): STRESS_BY_VISIT[scenario][v] + rng.normal(0, 0.1)
+                     for p in PATIENTS for v in VISITS}
 
     blocks, obs_rows, truth_rows = [], [], []
     for patient, drug in PATIENTS.items():
@@ -225,7 +265,9 @@ def simulate(seed: int = 42, cells_per_sample: int = 3700, theta: float = 6.0,
                 k = int((cts == ct).sum())
                 if k == 0:
                     continue
-                base = mu0[ct].values + patient_gene[patient] + treatment_effect(gidx, ct, dclass, visit).values
+                base = (mu0[ct].values + patient_gene[patient]
+                        + treatment_effect(gidx, ct, dclass, visit, scenario).values
+                        + sample_stress[(patient, visit)] * svec)
                 if ct in CD4_SWITCH:
                     is_s1 = rng.random(k) < S1_FRACTION[visit]
                     sub = np.where(is_s1, "S1", "S0")
@@ -248,6 +290,8 @@ def simulate(seed: int = 42, cells_per_sample: int = 3700, theta: float = 6.0,
                     obs_rows.append({
                         "patient": patient, "drug": drug, "drug_class": dclass,
                         "visit": f"M{visit}", "visit_month": visit, "sample": sample,
+                        "processing_batch": BATCH_BY_VISIT[scenario][visit],
+                        "stress_level": round(sample_stress[(patient, visit)], 3),
                         "cell_type": ct,
                         "cell_state": (f"CD4 {s}" if ct in CD4_SWITCH else
                                        (f"{s} CM" if ct == "Classical monocyte" else ct)),
@@ -256,41 +300,52 @@ def simulate(seed: int = 42, cells_per_sample: int = 3700, theta: float = 6.0,
     X = sp.vstack(blocks).tocsr()
     obs = pd.DataFrame(obs_rows)
     obs.index = [f"cell{i:06d}" for i in range(len(obs))]
-    for c in ["patient", "drug", "drug_class", "visit", "sample", "cell_type", "cell_state"]:
+    for c in ["patient", "drug", "drug_class", "visit", "sample", "processing_batch", "cell_type", "cell_state"]:
         obs[c] = obs[c].astype("category")
     adata = ad.AnnData(X=X, obs=obs, var=genes.copy())
     adata.uns["synthetic"] = {
         "description": "SYNTHETIC data mimicking the PRISM scRNA-seq design (Park et al. 2024). Not real measurements.",
         "seed": seed, "cells_per_sample": cells_per_sample, "nb_theta": theta,
-        "patient_sd": patient_sd, "ots_threshold_log2": ots_threshold,
+        "patient_sd": patient_sd, "ots_threshold_log2": ots_threshold, "scenario": scenario,
+        "stress_shift": STRESS_SHIFT,
     }
 
     # ---------------- ground truth from noise-free means (pseudobulk scale)
     for dclass in ["anti-IL-5", "anti-IL-4Ra"]:
         pts = [p for p, d in PATIENTS.items() if DRUG_CLASS[d] == dclass]
         for ct in BASE_PROPORTIONS:
-            means = []
-            for visit in VISITS:
-                acc = np.zeros(len(gidx))
-                for p in pts:
-                    base = mu0[ct].values + patient_gene[p] + treatment_effect(gidx, ct, dclass, visit).values
-                    if ct in CD4_SWITCH:
-                        f = S1_FRACTION[visit]
-                        m = (1 - f) * np.exp(base) + f * np.exp(base + states["S1"].values)
-                    elif ct == "Classical monocyte":
-                        f = IL1B_CM_FRACTION[visit]
-                        m = f * np.exp(base + states["IL1B+"].values) + (1 - f) * np.exp(base + states["S100A+"].values)
-                    else:
-                        m = np.exp(base)
-                    acc += m
-                means.append(np.log2(acc / len(pts) + 1e-3))
-            means = np.vstack(means).T  # genes x visits
-            d1, d2 = means[:, 1] - means[:, 0], means[:, 2] - means[:, 1]
-            ots = np.char.add(np.char.add(classify(d1, ots_threshold), "_"), classify(d2, ots_threshold))
-            expressed = means.max(axis=1) > np.log2(EXPRESSED_MIN)  # score only genes with real signal in this cell type
-            for g, o, e, row in zip(gidx, ots, expressed, means):
+            def visit_means(with_stress):
+                means = []
+                for visit in VISITS:
+                    acc = np.zeros(len(gidx))
+                    # biological truth holds stress at the scenario's baseline level
+                    s_level = STRESS_BY_VISIT[scenario][visit] if with_stress else STRESS_BY_VISIT[scenario][0]
+                    for p in pts:
+                        base = (mu0[ct].values + patient_gene[p]
+                                + treatment_effect(gidx, ct, dclass, visit, scenario).values + s_level * svec)
+                        if ct in CD4_SWITCH:
+                            f = S1_FRACTION[visit]
+                            m = (1 - f) * np.exp(base) + f * np.exp(base + states["S1"].values)
+                        elif ct == "Classical monocyte":
+                            f = IL1B_CM_FRACTION[visit]
+                            m = f * np.exp(base + states["IL1B+"].values) + (1 - f) * np.exp(base + states["S100A+"].values)
+                        else:
+                            m = np.exp(base)
+                        acc += m
+                    means.append(np.log2(acc / len(pts) + 1e-3))
+                return np.vstack(means).T  # genes x visits
+
+            def to_ots(means):
+                d1, d2 = means[:, 1] - means[:, 0], means[:, 2] - means[:, 1]
+                return np.char.add(np.char.add(classify(d1, ots_threshold), "_"), classify(d2, ots_threshold))
+
+            bio, obs_exp = visit_means(False), visit_means(True)
+            ots, ots_obs = to_ots(bio), to_ots(obs_exp)
+            expressed = bio.max(axis=1) > np.log2(EXPRESSED_MIN)  # score only genes with real signal in this cell type
+            for g, o, oo, e, row in zip(gidx, ots, ots_obs, expressed, bio):
                 truth_rows.append({"gene": g, "module": genes.loc[g, "module"], "cell_type": ct,
-                                   "drug_class": dclass, "true_OTS": o, "expressed": bool(e),
+                                   "drug_class": dclass, "true_OTS": o, "expected_observed_OTS": oo,
+                                   "stress_gene": g in STRESS_GENES, "expressed": bool(e),
                                    "log2_mean_M0": row[0], "log2_mean_M1": row[1], "log2_mean_M6": row[2]})
     truth = pd.DataFrame(truth_rows)
 
@@ -312,13 +367,16 @@ def main():
     ap.add_argument("--out", default="data/synthetic")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--cells-per-sample", type=int, default=3700)
+    ap.add_argument("--scenario", choices=sorted(STRESS_BY_VISIT), default="drug")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    adata, truth, composition = simulate(seed=args.seed, cells_per_sample=args.cells_per_sample)
-    adata.write_h5ad(out / "prism_like_synthetic.h5ad", compression="gzip")
-    truth.to_csv(out / "ground_truth_gene_topology.csv", index=False)
-    composition.to_csv(out / "ground_truth_composition.csv", index=False)
+    adata, truth, composition = simulate(seed=args.seed, cells_per_sample=args.cells_per_sample,
+                                         scenario=args.scenario)
+    sfx = "" if args.scenario == "drug" else f"_{args.scenario}"
+    adata.write_h5ad(out / f"prism_like_synthetic{sfx}.h5ad", compression="gzip")
+    truth.to_csv(out / f"ground_truth_gene_topology{sfx}.csv", index=False)
+    composition.to_csv(out / f"ground_truth_composition{sfx}.csv", index=False)
     print(f"cells={adata.n_obs} genes={adata.n_vars} samples={adata.obs['sample'].nunique()}")
     print(truth.query("expressed and true_OTS != 'flat_flat'")
           .groupby(["drug_class", "true_OTS"]).size().to_string())

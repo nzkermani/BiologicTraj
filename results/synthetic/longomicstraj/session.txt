@@ -1,2 +1,0 @@
-LongOmicsTraj 0.99.0, R 4.5.3
-delta_min = 0.35; min_expr = log2(0.1); cores = 1
