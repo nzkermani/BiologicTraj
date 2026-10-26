@@ -25,13 +25,16 @@ samples <- read.csv(file.path(pb_dir, "samples.csv"))
 index   <- read.csv(file.path(pb_dir, "index.csv"))
 bp      <- if (n_cores > 1) MulticoreParam(workers = n_cores) else SerialParam()
 
-run_one <- function(lot, estimator, threshold) {
-  lot <- if (estimator == "empirical") {
+estimate <- function(lot, estimator) {
+  if (estimator == "empirical") {
     lot_from_empirical(lot, assay = "transcriptomics", visits = visits, overwrite = TRUE, verbose = FALSE)
   } else {
     lot_from_lmm(lot, assay = "transcriptomics", formula_fixed = y ~ group * visit + (1 | subject_id),
                  visits = visits, BPPARAM = bp, overwrite = TRUE, verbose = FALSE)
   }
+}
+
+run_one <- function(lot, threshold) {
   lot <- lot_compute_deltas(lot, assay = "transcriptomics", visits = visits, overwrite = TRUE)
   lot <- if (threshold == "fixed") {
     lot_compute_thresholds(lot, assay = "transcriptomics", method = "fixed", delta_min = delta_min,
@@ -66,9 +69,11 @@ for (i in seq_len(nrow(index))) {
   base <- lot_create(expression = m, metadata = meta, visit_levels = visits,
                      time_values = c(M0 = 0, M1 = 1, M6 = 6))
   for (est in c("empirical", "lmm")) {
+    t0 <- Sys.time()
+    est_lot <- tryCatch(estimate(base, est), error = function(e) { message(ct, " ", est, ": ", conditionMessage(e)); NULL })
+    if (is.null(est_lot)) next
     for (thr in c("fixed", "hybrid")) {
-      t0 <- Sys.time()
-      res <- tryCatch(run_one(base, est, thr), error = function(e) { message(ct, " ", est, " ", thr, ": ", conditionMessage(e)); NULL })
+      res <- tryCatch(run_one(est_lot, thr), error = function(e) { message(ct, " ", est, " ", thr, ": ", conditionMessage(e)); NULL })
       if (is.null(res)) next
       o <- res$ots
       o$cell_type <- ct; o$threshold <- thr
@@ -78,8 +83,9 @@ for (i in seq_len(nrow(index))) {
       # comparator-aware queries (main analysis: LMM + fixed threshold)
       if (est == "lmm" && thr == "fixed" && length(ok_groups) == 2) {
         q <- function(cond, label) {
-          f <- tryCatch(lot_query(res$lot, conditions = cond), error = function(e) character(0))
-          ids <- if (is.data.frame(f)) unique(f$object_id) else unique(as.character(f))
+          # lot_query returns an S4Vectors DataFrame of matching OTS rows
+          f <- tryCatch(as.data.frame(lot_query(res$lot, conditions = cond)), error = function(e) NULL)
+          ids <- if (!is.null(f) && "object_id" %in% names(f)) unique(as.character(f$object_id)) else character(0)
           if (length(ids)) data.frame(cell_type = ct, query = label, gene = ids) else NULL
         }
         queries[[length(queries) + 1]] <- rbind(
