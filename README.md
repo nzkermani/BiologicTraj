@@ -6,10 +6,18 @@ BiologicTraj benchmarks a trajectory-aware perturbation model (PerturbGen) again
 
 > **Status:** student project (MSc/BSc), National Heart and Lung Institute, Imperial College London. The analysis pipeline runs end to end on **simulated** data with known answers; the real PRISM data are not yet in hand. The foundation-model steps (Aims 1–3) are not built yet.
 
-<p align="center">
-  <a href="docs/BiologicTraj_poster.pdf"><img src="docs/BiologicTraj_poster.png" alt="BiologicTraj project poster" width="640"></a>
-  <br><sub>Project poster: <a href="docs/BiologicTraj_poster.pdf">PDF (A4, scales to A0)</a></sub>
-</p>
+<table>
+  <tr>
+    <td align="center" width="50%"><a href="docs/BiologicTraj_poster.pdf"><img src="docs/BiologicTraj_poster.png" alt="BiologicTraj project poster: aims and design"></a></td>
+    <td align="center" width="50%"><a href="docs/BiologicTraj_results_poster.pdf"><img src="docs/BiologicTraj_results_poster.png" alt="BiologicTraj results poster: pipeline and synthetic benchmark"></a></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>Project poster</b>: aims and design · <a href="docs/BiologicTraj_poster.pdf">PDF</a></sub></td>
+    <td align="center"><sub><b>Results poster</b>: pipeline and synthetic benchmark (simulated data) · <a href="docs/BiologicTraj_results_poster.pdf">PDF</a></sub></td>
+  </tr>
+</table>
+
+<sub>Both A4; they scale to A0 without loss.</sub>
 
 ## Data
 
@@ -135,7 +143,7 @@ scripts/
   run_pipeline.sh            all of the above for one dataset
 data/synthetic/              ground truth (the .h5ad files are regenerated, not committed)
 results/synthetic/           scores and stress checks per scenario
-docs/                        poster and figures
+docs/                        posters (PNG, PDF) and figures
 ```
 
 ## References
