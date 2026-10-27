@@ -99,26 +99,34 @@ These numbers are an upper bound: the simulation has no ambient RNA, doublets or
 ### Aim 1 first pass: zero-shot scGPT vs PCA (synthetic, 5,000 cells)
 
 ```bash
+# all 1,625 genes
 python scripts/embed_and_evaluate.py --h5ad data/synthetic/prism_like_synthetic.h5ad --out results/synthetic/aim1 \
   --n-cells 5000 --model scgpt:models/scGPT_blood --model scgpt:models/scGPT_human
+# 125 planted genes only (background genes dropped)
+python scripts/embed_and_evaluate.py --h5ad data/synthetic/prism_like_synthetic.h5ad --out results/synthetic/aim1_planted_genes \
+  --n-cells 5000 --drop-background --model scgpt:models/scGPT_blood --model scgpt:models/scGPT_human
 ```
 
-All scores are leave-one-patient-out k-NN. The noise row is a random Gaussian embedding, three seeds, to give each metric's null level.
+Same 4,992 cells in every run. All scores are leave-one-patient-out k-NN. The noise row is a random Gaussian embedding (three seeds) scored on the same cells, to give each metric's null level.
 
-| Method | Cell type acc. | Visit bal. acc. (M6 vs earlier) | Drug class bal. acc. (B cells, M6) | Same-patient neighbours | CPU time |
-| --- | --- | --- | --- | --- | --- |
-| PCA (50 PCs) | **1.00** | **0.80** | 0.30 | 0.31 | 7 s |
-| scGPT zero-shot, blood | 0.79 | 0.68 | 0.28 | 0.14 | 28 min |
-| scGPT zero-shot, whole-human | 0.85 | 0.68 | 0.28 | 0.14 | 30 min |
-| Random noise (null) | 0.13–0.14 | 0.50 | 0.22–0.34 | 0.12 | — |
+| Genes | Method | Cell type acc. | Visit bal. acc. (M6 vs earlier) | Drug class bal. acc. (B cells, M6) | Same-patient neighbours | CPU time |
+| --- | --- | --- | --- | --- | --- | --- |
+| all 1,625 | PCA (50 PCs) | **1.00** | **0.80** | 0.30 | 0.31 | 7 s |
+| all 1,625 | scGPT zero-shot, blood | 0.79 | 0.68 | 0.28 | 0.14 | 28 min |
+| all 1,625 | scGPT zero-shot, whole-human | 0.85 | 0.68 | 0.28 | 0.14 | 30 min |
+| planted 125 | PCA (50 PCs) | **1.00** | **0.83** | 0.39 | 0.16 | 0.5 s |
+| planted 125 | scGPT zero-shot, blood | 0.96 | 0.74 | 0.36 | 0.15 | 2 min |
+| planted 125 | scGPT zero-shot, whole-human | 0.99 | 0.82 | 0.40 | 0.16 | 5 min |
+| — | Random noise (null) | 0.13–0.14 | 0.50 | 0.22–0.34 | 0.12 | — |
 
-Chance for same-patient neighbours is 0.13. Metrics: [aim1_metrics.csv](results/synthetic/aim1/aim1_metrics.csv); UMAPs: [aim1_umaps.png](results/synthetic/aim1/aim1_umaps.png).
+Chance for same-patient neighbours is 0.13. Metrics and UMAPs: [all genes](results/synthetic/aim1/), [planted genes](results/synthetic/aim1_planted_genes/).
 
 What this shows:
 
-1. **PCA wins on every metric here, but this is not a verdict on scGPT.** 1,500 of the 1,625 genes have real names and random expression, so scGPT's pretrained gene knowledge has nothing true to match, while PCA's variable-gene selection discards uncorrelated noise. A gene-panel run (125 planted genes only) and a real dataset are needed before ranking methods.
-2. **scGPT keeps cell type and part of the visit effect, and loses patient structure.** The whole-human checkpoint keeps cell identity better than the blood one (0.85 vs 0.79). Its same-patient fraction equals chance, so the planted patient effects (SD 0.15 log) are not represented.
-3. **The drug-class metric does not work as built.** Every method, including pure noise, scores below 0.5. With 4 patients per class, holding one out leaves 3 vs 4 in training, which biases k-NN towards the other class. It needs a sample-level test with a permutation null ([revised Aim 1](docs/aim1_design.md), Q3).
+1. **Most of scGPT's gap to PCA comes from the background genes.** Dropping them lifts scGPT whole-human from 0.85 to 0.99 on cell type and from 0.68 to 0.82 on visit, level with PCA (1.00, 0.83). The background genes have real names but expression unrelated to those names, which confuses a model that reads gene identity; PCA is barely affected. On the planted genes, the whole-human checkpoint beats the blood one on every metric.
+2. **PCA's patient structure came from the background genes.** The simulator gives every gene, background included, a per-patient offset (SD 0.15 log). Across 1,500 background genes these add up, so PCA groups cells by patient (0.31). With planted genes only, PCA drops to 0.16, close to scGPT and chance. So scGPT did not "lose" patient biology so much as ignore a diffuse many-gene signal that PCA picks up. Whether that signal is biology or nuisance depends on the real data.
+3. **The drug-class metric still does not work as built.** All values sit at or near the noise range, which itself lies below 0.5: with 4 patients per class, holding one out leaves 3 vs 4 in training and biases k-NN towards the other class. It needs a sample-level test with a permutation null ([revised Aim 1](docs/aim1_design.md), Q3).
+4. **Still synthetic.** Parity on 125 clean planted genes is the best case for scGPT. Ranking methods needs a real longitudinal PBMC dataset, then PRISM.
 
 ## Known risks
 

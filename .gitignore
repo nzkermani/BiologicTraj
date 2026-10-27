@@ -11,6 +11,6 @@ results/**/pseudobulk_voom/*.csv
 results/**/longomicstraj/ots_all.csv
 results/**/stress_check/stress_scores_per_sample_celltype.csv
 results/**/log_*.txt
-results/**/aim1/embeddings.npz
+results/**/aim1*/embeddings.npz
 models/
-results/**/aim1/subsample_obs.csv
+results/**/aim1*/subsample_obs.csv
