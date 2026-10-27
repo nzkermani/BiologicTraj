@@ -1,0 +1,10 @@
+# Aim 1 (scGPT zero-shot embeddings), on top of requirements.txt. Python 3.11, CPU only.
+# Install in this order:
+#   pip install -r requirements.txt
+#   pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+#   pip install -r requirements-aim1.txt
+#   pip install --no-deps "git+https://github.com/bowang-lab/scGPT.git"   # scGPT 0.2.5 was used
+# --no-deps avoids scGPT's own pinned, GPU-oriented requirements.
+gdown==6.4.2
+ipython==9.17.1
+datasets==5.1.0

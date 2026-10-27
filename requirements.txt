@@ -1,0 +1,10 @@
+# BiologicTraj pipeline (Python steps), Python 3.11.
+# Versions used for the results in this repository (October 2026).
+anndata==0.12.19
+scanpy==1.11.5
+numpy==2.4.6
+pandas==2.3.3
+scipy==1.17.1
+scikit-learn==1.9.1
+matplotlib==3.11.2
+h5py==3.16.0

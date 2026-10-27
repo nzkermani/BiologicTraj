@@ -166,13 +166,15 @@ From a critical review of the design:
 
 ### Environment
 
-Python (pipeline): `pip install anndata scanpy`.
+**Running on your own data:** see the [run guide](docs/RUN_GUIDE.md) (input format, input check, what to send back).
 
-Python (Aim 1, scGPT). Python 3.11, CPU only. The Aim 1 results were produced with torch 2.14.1+cpu, scanpy 1.11.5, anndata 0.12.19, scikit-learn 1.9.1 and scGPT 0.2.5.
+Python (pipeline), Python 3.11: `pip install -r requirements.txt` (pinned versions used for these results).
+
+Python (Aim 1, scGPT), CPU only, on top of the pipeline requirements. The Aim 1 results were produced with torch 2.14.1+cpu and scGPT 0.2.5.
 
 ```bash
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-pip install scanpy anndata scikit-learn gdown IPython datasets
+pip install torch==2.14.1 --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements-aim1.txt
 pip install --no-deps "git+https://github.com/bowang-lab/scGPT.git"   # --no-deps avoids its pinned, GPU-oriented requirements
 # pretrained checkpoints (links from the scGPT README, October 2026); not committed (models/ is git-ignored)
 gdown --folder https://drive.google.com/drive/folders/1kkug5C7NjvXIwQGGaGoqXTk_Lb_pDrBU -O models/scGPT_blood
@@ -181,7 +183,7 @@ gdown --folder https://drive.google.com/drive/folders/1oWh_-ZRdhtoGQ2Fw24HP41FgL
 
 Each checkpoint folder holds `best_model.pt`, `vocab.json` and `args.json`. On a laptop-class CPU, scGPT embedding takes about 30 minutes per checkpoint for 5,000 cells × 1,625 genes, and 2–5 minutes with the 125 planted genes.
 
-R: edgeR, limma and LongOmicsTraj (`devtools::install_github("nzkermani/LongOmicsTraj")`). LongOmicsTraj's DESCRIPTION asks for R ≥ 4.6; the results here were produced under R 4.5.3 with that requirement relaxed locally, where its full test suite (100 tests) passes.
+R: edgeR, limma, BiocParallel and LongOmicsTraj; `Rscript scripts/install_R_packages.R` installs them and records versions. LongOmicsTraj's DESCRIPTION asks for R ≥ 4.6; the results here were produced under R 4.5.3 with that requirement relaxed locally, where its full test suite (100 tests) passes.
 
 ## Repository layout
 
@@ -196,6 +198,8 @@ scripts/
   run_longomicstraj.R        LongOmicsTraj on pseudobulk
   score_longomicstraj.py     score against ground truth
   run_pipeline.sh            all of the above for one dataset
+  check_input.py             checks a real-data .h5ad before running (counts, genes, metadata)
+  install_R_packages.R       installs the R packages, records versions
   embed_and_evaluate.py      Aim 1: PCA vs scGPT zero-shot embeddings, k-NN metrics, UMAPs
 data/synthetic/              ground truth (the .h5ad files are regenerated, not committed)
 results/synthetic/
@@ -203,10 +207,13 @@ results/synthetic/
   aim1/                      Aim 1, all 1,625 genes (metrics + UMAPs)
   aim1_planted_genes/        Aim 1, 125 planted genes only
 docs/
+  RUN_GUIDE.md               running the pipeline on your own data
   aim1_design.md             revised Aim 1 design (sample-level metrics)
   poster_src/                HTML source of results poster page 2
                              plus posters (PNG, PDF) and figures
 models/                      scGPT checkpoints (downloaded, not committed)
+requirements.txt             pinned Python packages (pipeline)
+requirements-aim1.txt        extra Python packages for Aim 1 (scGPT)
 ```
 
 ## References
