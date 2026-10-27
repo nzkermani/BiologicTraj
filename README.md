@@ -144,8 +144,10 @@ From a critical review of the design:
 - [ ] Cell annotation from clustering instead of true labels; add ambient RNA and batch effects to the simulator
 - [ ] Composition analysis (cell types and states per visit)
 - [ ] Leave-one-patient-out stability of trajectory shapes
-- [x] Zero-shot scGPT embeddings on synthetic data (Aim 1 first pass, above)
-- [ ] Revised Aim 1 metrics ([design](docs/aim1_design.md)), scVI/scPoli baselines, 125-gene panel run
+- [x] Zero-shot scGPT embeddings on synthetic data, all genes and 125 planted genes (Aim 1 first pass, above)
+- [ ] Revised Aim 1 metrics ([design](docs/aim1_design.md)): batch removal, sample-level shift consistency, drug class with permutation null
+- [ ] scVI and scPoli baselines
+- [ ] Real longitudinal PBMC dataset (public) to rank embedding methods before PRISM
 - [ ] PerturbGen fine-tuning on HPC (Aims 2–3)
 - [ ] Request PRISM counts plus processing, batch and steroid metadata
 
@@ -160,7 +162,22 @@ From a critical review of the design:
 
 ### Environment
 
-Python: `pip install anndata scanpy`. R: edgeR, limma and LongOmicsTraj (`devtools::install_github("nzkermani/LongOmicsTraj")`). LongOmicsTraj's DESCRIPTION asks for R ≥ 4.6; the results here were produced under R 4.5.3 with that requirement relaxed locally, where its full test suite (100 tests) passes.
+Python (pipeline): `pip install anndata scanpy`.
+
+Python (Aim 1, scGPT). Python 3.11, CPU only. The Aim 1 results were produced with torch 2.14.1+cpu, scanpy 1.11.5, anndata 0.12.19, scikit-learn 1.9.1 and scGPT 0.2.5.
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install scanpy anndata scikit-learn gdown IPython datasets
+pip install --no-deps "git+https://github.com/bowang-lab/scGPT.git"   # --no-deps avoids its pinned, GPU-oriented requirements
+# pretrained checkpoints (links from the scGPT README, October 2026); not committed (models/ is git-ignored)
+gdown --folder https://drive.google.com/drive/folders/1kkug5C7NjvXIwQGGaGoqXTk_Lb_pDrBU -O models/scGPT_blood
+gdown --folder https://drive.google.com/drive/folders/1oWh_-ZRdhtoGQ2Fw24HP41FgLoomVo-y -O models/scGPT_human
+```
+
+Each checkpoint folder holds `best_model.pt`, `vocab.json` and `args.json`. On a laptop-class CPU, scGPT embedding takes about 30 minutes per checkpoint for 5,000 cells × 1,625 genes, and 2–5 minutes with the 125 planted genes.
+
+R: edgeR, limma and LongOmicsTraj (`devtools::install_github("nzkermani/LongOmicsTraj")`). LongOmicsTraj's DESCRIPTION asks for R ≥ 4.6; the results here were produced under R 4.5.3 with that requirement relaxed locally, where its full test suite (100 tests) passes.
 
 ## Repository layout
 
@@ -175,9 +192,16 @@ scripts/
   run_longomicstraj.R        LongOmicsTraj on pseudobulk
   score_longomicstraj.py     score against ground truth
   run_pipeline.sh            all of the above for one dataset
+  embed_and_evaluate.py      Aim 1: PCA vs scGPT zero-shot embeddings, k-NN metrics, UMAPs
 data/synthetic/              ground truth (the .h5ad files are regenerated, not committed)
-results/synthetic/           scores and stress checks per scenario
-docs/                        posters (PNG, PDF) and figures
+results/synthetic/
+  drug/, stress_batch/       pipeline scores and stress checks per scenario
+  aim1/                      Aim 1, all 1,625 genes (metrics + UMAPs)
+  aim1_planted_genes/        Aim 1, 125 planted genes only
+docs/
+  aim1_design.md             revised Aim 1 design (sample-level metrics)
+                             plus posters (PNG, PDF) and figures
+models/                      scGPT checkpoints (downloaded, not committed)
 ```
 
 ## References
