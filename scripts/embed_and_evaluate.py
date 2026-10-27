@@ -29,6 +29,11 @@ Usage:
   python scripts/embed_and_evaluate.py --h5ad data/synthetic/prism_like_synthetic.h5ad \
      --out results/synthetic/aim1 --n-cells 5000 \
      --model scgpt:models/scGPT_blood --model scgpt:models/scGPT_human
+
+  --drop-background  synthetic data only: keep only the 125 planted genes
+                     (var["module"] != "background"). The background genes have
+                     real names but random expression, which handicaps models that
+                     read gene names; this run removes that handicap.
 """
 
 import argparse
@@ -133,11 +138,17 @@ def main():
     ap.add_argument("--n-cells", type=int, default=5000)
     ap.add_argument("--model", action="append", default=[], help="scgpt:<checkpoint dir>; repeatable")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--drop-background", action="store_true",
+                    help="synthetic only: drop genes with var['module'] == 'background'")
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
     a = stratified_subsample(ad.read_h5ad(args.h5ad), args.n_cells, args.seed)
+    if args.drop_background:
+        if "module" not in a.var:
+            raise SystemExit("--drop-background needs var['module'] (synthetic data only)")
+        a = a[:, a.var["module"] != "background"].copy()
     print(f"subsample: {a.n_obs} cells, {a.obs['sample'].nunique()} samples, {a.n_vars} genes")
     rows, embs = [], {}
 
