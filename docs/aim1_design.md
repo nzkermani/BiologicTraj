@@ -1,6 +1,6 @@
 # Aim 1 (revised): representation, with the patient as the unit
 
-**Status:** design proposal, not yet implemented. The current script (`scripts/embed_and_evaluate.py`) computes the cell-level checks in section 4; sections 2–3 are to be built.
+**Status:** design proposal. The current script (`scripts/embed_and_evaluate.py`) computes the cell-level checks in section 4 and the gene-panel run; Q1 batch metrics and Q2–Q3 are to be built.
 
 ## 1. Why revise
 
@@ -34,7 +34,7 @@ The first version of Aim 1 scored embeddings with cell-level k-NN: can a held-ou
 | scGPT fine-tuned | HPC; only if zero-shot is competitive |
 | PerturbGen | Aims 2–3; its embedding can be scored here too |
 
-All methods get the same cells (stratified subsample, fixed seed) and the same gene set. A **gene-panel sensitivity run** repeats everything on the 125 planted genes only: on synthetic data the 1,500 background genes have real names but random expression, which handicaps models that read gene names (scGPT) more than PCA.
+All methods get the same cells (stratified subsample, fixed seed) and the same gene set. A **gene-panel sensitivity run** (`--drop-background`) repeats everything on the 125 planted genes only. On synthetic data the 1,500 background genes have real names but expression unrelated to those names (apart from per-patient offsets), which handicaps models that read gene names (scGPT) more than PCA. The first pass confirmed this: on planted genes only, scGPT whole-human matches PCA on cell type and visit (README, Aim 1 first pass).
 
 ### Q1: identity vs batch (scIB-style)
 
@@ -79,7 +79,7 @@ From the current script, reported but not headline:
 ## 5. What synthetic results can and cannot show
 
 - **Can:** whether each metric recovers planted effects, rejects untouched cell types, and flags the stress artefact; whether code runs end to end.
-- **Cannot:** rank scGPT against PCA for real biology. Background-gene expression is noise, so scGPT's pretrained gene knowledge has nothing true to match. Ranking needs a real public longitudinal PBMC dataset, then PRISM.
+- **Cannot:** rank scGPT against PCA for real biology. Background-gene expression does not follow the genes' real biology, so scGPT's pretrained gene knowledge has nothing true to match there, and the planted genes are a clean best case. Ranking needs a real public longitudinal PBMC dataset, then PRISM.
 
 ## 6. Build order
 
