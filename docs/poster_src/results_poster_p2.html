@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BiologicTraj Aim 1</title>
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #14213d; --ink2: #3f4a5c; --muted: #6b7486;
+    --teal: #127a6c; --orange: #b8571b; --grey: #8e9bb3;
+    --panel: #eef2f7; --cream: #fcf1e6; --tealbg: #e7f1ef; --rule: #d5dbe4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 210mm; height: 297mm; background: #fff; }
+  body { font-family: "IBM Plex Sans", sans-serif; color: var(--ink); padding: 13.5mm 13.5mm 10mm; position: relative; }
+  .eyebrow { font-size: 8.6pt; font-weight: 600; letter-spacing: 0.12em; color: var(--teal); text-transform: uppercase; }
+  h1 { font-size: 27pt; line-height: 1.08; font-weight: 700; margin-top: 2.6mm; letter-spacing: -0.01em; }
+  .sub { font-size: 12pt; font-weight: 500; margin-top: 3mm; }
+  .byline { font-size: 9pt; color: var(--ink2); margin-top: 2.6mm; }
+  .toprule { height: 2px; background: var(--teal); margin: 4mm 0 4mm; }
+  h2 { font-size: 13.5pt; font-weight: 700; margin-bottom: 3mm; }
+  .k { font-size: 8.6pt; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .flow { display: grid; grid-template-columns: 1fr 14px 1fr 14px 1fr; align-items: stretch; gap: 0 2.5mm; }
+  .step { border-radius: 2.4mm; padding: 3mm 3.4mm; font-size: 9.6pt; line-height: 1.35; color: var(--ink2); }
+  .step b { display: block; color: var(--ink); font-size: 10.6pt; margin: 1mm 0 0.8mm; }
+  .step .k { color: var(--teal); }
+  .s1 { background: var(--panel); } .s2 { background: var(--tealbg); } .s3 { background: var(--ink); color: #c9d1de; }
+  .s3 b { color: #fff; } .s3 .k { color: #7fd1c3; }
+  .chev { align-self: center; color: var(--ink); font-size: 16pt; font-weight: 300; text-align: center; }
+
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.4mm; margin: 3.6mm 0 4mm; }
+  .tile { border-radius: 2.4mm; padding: 3mm 3.6mm; background: var(--panel); }
+  .tile.warm { background: var(--cream); }
+  .big { font-size: 23pt; font-weight: 700; line-height: 1.1; }
+  .big small { font-size: 12pt; font-weight: 500; color: var(--ink2); }
+  .tile.warm .big { color: var(--orange); }
+  .tile p { font-size: 9.2pt; color: var(--ink2); line-height: 1.35; margin-top: 1.4mm; }
+
+  .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .chart h3 { font-size: 10.6pt; font-weight: 700; margin-bottom: 1mm; }
+  .chart .note { font-size: 8.4pt; color: var(--muted); }
+  svg text { font-family: "IBM Plex Sans", sans-serif; }
+  .legend { display: flex; gap: 5mm; font-size: 9pt; color: var(--ink2); margin-top: 1.6mm; }
+  .sw { display: inline-block; width: 3.2mm; height: 3.2mm; border-radius: 0.6mm; vertical-align: -0.4mm; margin-right: 1.4mm; }
+  .dash { display: inline-block; width: 6mm; border-top: 1.5px dashed var(--orange); vertical-align: 0.8mm; margin-right: 1.4mm; }
+
+  .learned { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 4.5mm; }
+  .learned div { border-top: 2px solid var(--ink); padding-top: 2.2mm; font-size: 9.6pt; line-height: 1.4; }
+  .learned .k { display: block; color: var(--teal); margin-bottom: 1.2mm; }
+
+  .review { margin-top: 3.4mm; background: var(--panel); border-radius: 2.4mm; padding: 3.4mm 4mm 3.2mm; }
+  .review h2 { margin-bottom: 0.6mm; }
+  .review .who { font-size: 8.6pt; color: var(--muted); margin-bottom: 2.4mm; }
+  .review ol { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 1.6mm 6mm; }
+  .review li { font-size: 9.4pt; line-height: 1.35; color: var(--ink2); padding-left: 6mm; position: relative; }
+  .review li b { color: var(--ink); }
+  .review li .n { position: absolute; left: 0; top: 0; font-weight: 700; color: var(--teal); }
+  .review li .tag { font-size: 7.6pt; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--orange); }
+  .issue { font-family: "IBM Plex Mono", monospace; font-size: 8.4pt; color: var(--muted); }
+
+  footer { position: absolute; left: 13.5mm; right: 13.5mm; bottom: 8mm; border-top: 1px solid var(--rule); padding-top: 2.6mm;
+           display: flex; justify-content: space-between; align-items: flex-end; font-size: 8.6pt; color: var(--ink2); line-height: 1.45; }
+  footer .code { text-align: right; }
+  footer .code .k { color: var(--ink2); }
+  footer .code div:last-child { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 10pt; color: var(--ink); }
+</style>
+</head>
+<body>
+  <div class="eyebrow">BiologicTraj · Aim 1 first pass and review · all data simulated</div>
+  <h1>Does a foundation model<br>see more than PCA?</h1>
+  <div class="sub">Zero-shot scGPT vs PCA on the same 4,992 synthetic PBMCs, 24 samples.</div>
+  <div class="byline">Supervisor: Dr Nazanin Zounemat-Kermani · National Heart and Lung Institute, Imperial College London</div>
+  <div class="toprule"></div>
+
+  <div class="flow">
+    <div class="step s1"><span class="k">1 · Embed</span><b>Three embeddings</b>PCA (50 PCs); scGPT blood and whole-human checkpoints, no retraining</div>
+    <div class="chev">›</div>
+    <div class="step s2"><span class="k">2 · Score</span><b>Leave one patient out</b>Can a new patient's cells be told apart by cell type, and month 6 vs earlier?</div>
+    <div class="chev">›</div>
+    <div class="step s3"><span class="k">3 · Two gene sets</span><b>All 1,625 vs 125 planted</b>1,500 filler genes have real names but random expression</div>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="big">0.85 <small>→</small> 0.99</div><p>scGPT whole-human, cell type: all genes vs planted only. PCA: 1.00 on both.</p></div>
+    <div class="tile"><div class="big">0.31 <small>→</small> 0.16</div><p>PCA same-patient neighbours (chance 0.13). Patient signal sat in the filler genes.</p></div>
+    <div class="tile warm"><div class="big">&lt; 0.5</div><p>drug-class score for every method, random noise included: the metric itself is biased.</p></div>
+  </div>
+
+  <div class="charts">
+    <div class="chart">
+      <h3>Cell type accuracy</h3>
+      <svg id="c1" viewBox="0 0 330 132" width="100%"></svg>
+    </div>
+    <div class="chart">
+      <h3>Month 6 vs earlier (balanced accuracy)</h3>
+      <svg id="c2" viewBox="0 0 330 132" width="100%"></svg>
+    </div>
+  </div>
+  <div class="legend">
+    <span><span class="sw" style="background:var(--grey)"></span>all 1,625 genes</span>
+    <span><span class="sw" style="background:var(--teal)"></span>125 planted genes only</span>
+    <span><span class="dash"></span>random-embedding null</span>
+  </div>
+
+  <h2 style="margin-top:3mm">What we learned</h2>
+  <div class="learned" style="margin-top:0">
+    <div><span class="k">1 · Filler misleads scGPT</span>Real names, random expression: this misleads a model that reads gene names. Without it, whole-human scGPT matches PCA.</div>
+    <div><span class="k">2 · Patient signal was diffuse</span>PCA grouped patients by summing small offsets over 1,500 genes. Biology or nuisance? Real data will tell.</div>
+    <div><span class="k">3 · Some metrics lie</span>With 4 patients per drug, leaving one out tilts k-NN against its class. Drug needs a patient-level test.</div>
+  </div>
+
+  <div class="review">
+    <h2>Review: what to do next</h2>
+    <div class="who">Structured review by Claude in the style of a single-cell methods reviewer and an asthma airway biologist. Tracked as GitHub issues. All of this is synthetic: planted genes are scGPT's best case, and ranking methods needs real data.</div>
+    <ol>
+      <li><span class="n">1</span><span class="tag">Methods</span> <b>Semi-synthetic benchmark:</b> inject known effects into real PBMCs. <span class="issue">#1</span></li>
+      <li><span class="n">2</span><span class="tag">Biology</span> <b>Write down expected effects</b> per drug and cell type before modelling. <span class="issue">#9</span></li>
+      <li><span class="n">3</span><span class="tag">Biology</span> <b>Rare type-2 cells</b> (Th2, ILC2, basophils) on all cells, not a subsample. <span class="issue">#8</span></li>
+      <li><span class="n">4</span><span class="tag">Methods</span> <b>Patient-level metrics,</b> scVI/scPoli and reference annotation. <span class="issue">#2 #3 #4</span></li>
+      <li style="grid-column: 1 / -1"><span class="n">5</span><span class="tag">Biology</span> <b>Link to clinical change</b> and test blood signatures in U-BIOPRED airway data. <span class="issue">#10 #11</span></li>
+    </ol>
+  </div>
+
+  <footer>
+    <div>scGPT: Cui et al., <i>Nat Methods</i> 2024 (blood and whole-human checkpoints).<br>Metrics after scIB, Luecken et al., <i>Nat Methods</i> 2022. CPU only, 2–30 min per run.</div>
+    <div class="code"><div class="k">Code &amp; issues</div><div>github.com/nzkermani/BiologicTraj</div></div>
+  </footer>
+
+<script>
+const data = [
+  // method, cell type (all, planted), visit (all, planted)
+  ["PCA",               [0.9998, 1.000], [0.8038, 0.8307]],
+  ["scGPT blood",       [0.7931, 0.9571], [0.6766, 0.7361]],
+  ["scGPT whole-human", [0.8506, 0.9866], [0.6772, 0.8154]],
+];
+function draw(id, idx, nullv) {
+  const svg = document.getElementById(id), NS = "http://www.w3.org/2000/svg";
+  const L = 92, R = 300, top = 6, rowH = 36, barH = 11, gap = 2;
+  const x = v => L + v * (R - L);
+  const el = (t, a, txt) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); if (txt != null) e.textContent = txt; svg.appendChild(e); return e; };
+  [0, 0.5, 1].forEach(v => {
+    el("line", {x1: x(v), x2: x(v), y1: top - 2, y2: top + rowH * 3, stroke: "#e3e7ee", "stroke-width": 1});
+    el("text", {x: x(v), y: top + rowH * 3 + 11, "font-size": 8.5, fill: "#6b7486", "text-anchor": "middle"}, v === 0 ? "0" : v === 1 ? "1" : "0.5");
+  });
+  data.forEach((d, i) => {
+    const y0 = top + i * rowH + 7;
+    el("text", {x: L - 7, y: y0 + barH + 4, "font-size": 9.2, fill: "#14213d", "text-anchor": "end"}, d[0]);
+    d[idx].forEach((v, j) => {
+      const y = y0 + j * (barH + gap), w = x(v) - L;
+      el("path", {d: `M${L},${y} h${w - 3} a3,3 0 0 1 3,3 v${barH - 6} a3,3 0 0 1 -3,3 h${-(w - 3)} z`, fill: j ? "#127a6c" : "#8e9bb3"});
+      el("text", {x: x(v) + 4, y: y + barH - 2.5, "font-size": 8.6, fill: "#3f4a5c"}, v.toFixed(2));
+    });
+  });
+  el("line", {x1: x(nullv), x2: x(nullv), y1: top - 2, y2: top + rowH * 3, stroke: "#b8571b", "stroke-width": 1.3, "stroke-dasharray": "3 2.5"});
+  el("line", {x1: L, x2: L, y1: top - 2, y2: top + rowH * 3, stroke: "#9aa3b2", "stroke-width": 1});
+}
+draw("c1", 1, 0.14);
+draw("c2", 2, 0.50);
+</script>
+</body>
+</html>

@@ -8,16 +8,18 @@ BiologicTraj benchmarks a trajectory-aware perturbation model (PerturbGen) again
 
 <table>
   <tr>
-    <td align="center" width="50%"><a href="docs/BiologicTraj_poster.pdf"><img src="docs/BiologicTraj_poster.png" alt="BiologicTraj project poster: aims and design"></a></td>
-    <td align="center" width="50%"><a href="docs/BiologicTraj_results_poster.pdf"><img src="docs/BiologicTraj_results_poster.png" alt="BiologicTraj results poster: pipeline and synthetic benchmark"></a></td>
+    <td align="center" width="33%"><a href="docs/BiologicTraj_poster.pdf"><img src="docs/BiologicTraj_poster.png" alt="BiologicTraj project poster: aims and design"></a></td>
+    <td align="center" width="33%"><a href="docs/BiologicTraj_results_poster.pdf"><img src="docs/BiologicTraj_results_poster.png" alt="BiologicTraj results poster, page 1: pipeline and synthetic benchmark"></a></td>
+    <td align="center" width="33%"><a href="docs/BiologicTraj_results_poster.pdf"><img src="docs/BiologicTraj_results_poster_p2.png" alt="BiologicTraj results poster, page 2: zero-shot scGPT vs PCA and review priorities"></a></td>
   </tr>
   <tr>
     <td align="center"><sub><b>Project poster</b>: aims and design · <a href="docs/BiologicTraj_poster.pdf">PDF</a></sub></td>
-    <td align="center"><sub><b>Results poster</b>: pipeline and synthetic benchmark (simulated data) · <a href="docs/BiologicTraj_results_poster.pdf">PDF</a></sub></td>
+    <td align="center"><sub><b>Results poster, page 1</b>: pipeline and synthetic benchmark · <a href="docs/BiologicTraj_results_poster.pdf">PDF</a></sub></td>
+    <td align="center"><sub><b>Results poster, page 2</b>: scGPT vs PCA (Aim 1) and review priorities · same PDF</sub></td>
   </tr>
 </table>
 
-<sub>Both A4; they scale to A0 without loss.</sub>
+<sub>All A4; they scale to A0 without loss. Page 2 source: <a href="docs/poster_src/results_poster_p2.html">docs/poster_src</a>.</sub>
 
 ## Data
 
@@ -128,6 +130,8 @@ What this shows:
 3. **The drug-class metric still does not work as built.** All values sit at or near the noise range, which itself lies below 0.5: with 4 patients per class, holding one out leaves 3 vs 4 in training and biases k-NN towards the other class. It needs a sample-level test with a permutation null ([revised Aim 1](docs/aim1_design.md), Q3).
 4. **Still synthetic.** Parity on 125 clean planted genes is the best case for scGPT. Ranking methods needs a real longitudinal PBMC dataset, then PRISM.
 
+Review priorities from a structured methods and biology review are tracked as [GitHub issues](https://github.com/nzkermani/BiologicTraj/issues).
+
 ## Known risks
 
 From a critical review of the design:
@@ -200,6 +204,7 @@ results/synthetic/
   aim1_planted_genes/        Aim 1, 125 planted genes only
 docs/
   aim1_design.md             revised Aim 1 design (sample-level metrics)
+  poster_src/                HTML source of results poster page 2
                              plus posters (PNG, PDF) and figures
 models/                      scGPT checkpoints (downloaded, not committed)
 ```
